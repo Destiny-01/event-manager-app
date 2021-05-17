@@ -1,16 +1,19 @@
 const mongoose = require("mongoose");
 
-const connectionString = "mongodb://localhost:27017";
+const url = `mongodb+srv://aigbe_destiny:Destiny1@cluster0.7bohx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 
+const connectionParams = {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true,
+};
 module.exports = () => {
-  mongoose.connect(
-    connectionString,
-    {
-      useNewURIParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
-    },
-    (err) =>
-      err ? console.log(err) : console.log("database connection successful")
-  );
+  mongoose
+    .connect(url, connectionParams)
+    .then(() => {
+      console.log("Connected to database ");
+    })
+    .catch((err) => {
+      console.error(`Error connecting to the database. \n${err}`);
+    });
 };
