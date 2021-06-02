@@ -5,18 +5,18 @@ const secret = "WoAhhhH";
 const expriry = 36000;
 
 exports.registerNewUser = (req, res) => {
-  User.findOne({ username: req.body.username }, (err, existingUser) => {
+  User.findOne({ email: req.body.email }, (err, existingUser) => {
     if (err) {
       return res.status(500).json({ err });
     }
     if (existingUser) {
-      return res.status(400).json({ message: "username has been taken" });
+      return res.status(400).json({ message: "email has been taken" });
     }
     User.create(
       {
         firstname: req.body.firstname,
         lastname: req.body.lastname,
-        username: req.body.username,
+        email: req.body.email,
       },
       (err, newUser) => {
         if (err) {
@@ -37,7 +37,7 @@ exports.registerNewUser = (req, res) => {
                   id: newUser._id,
                   firstname: newUser.firstname,
                   lastname: newUser.lastname,
-                  username: newUser.username,
+                  email: newUser.email,
                 },
                 secret,
                 { expiresIn: expriry },
@@ -46,7 +46,7 @@ exports.registerNewUser = (req, res) => {
                     return res.status(500).json({ err });
                   }
                   return res.status(200).json({
-                    message: "Welcome to the family ${req.body.username}",
+                    message: `Welcome to the family ${req.body.firstname} ${req.body.lastname}`,
                     token,
                   });
                 }
@@ -54,6 +54,41 @@ exports.registerNewUser = (req, res) => {
             });
           });
         });
+      }
+    );
+  });
+};
+
+exports.loginuser = (req, res) => {
+  User.findOne({ email: req.body.email }, (err, foundUser) => {
+    if (err) {
+      return res.status(500).json({ err });
+    }
+    if (!foundUser) {
+      return res.status(401).json({ message: "incorrect email" });
+    }
+    let match = bcrypt.compareSync(req.body.password, foundUser.password);
+    if (!match) {
+      return res.status(401).json({ message: "incorrect password" });
+    }
+    jwt.sign(
+      {
+        id: foundUser._id,
+        email: foundUser.email,
+        firstname: foundUser.firstname,
+        lastname: foundUser.lastname,
+      },
+      secret,
+      {
+        expiresIn: expriry,
+      },
+      (err, token) => {
+        if (err) {
+          return res.status(500).json({ err });
+        }
+        return res
+          .status(200)
+          .json({ message: "user logged in successfully", token });
       }
     );
   });
