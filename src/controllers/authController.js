@@ -17,6 +17,7 @@ exports.registerNewUser = (req, res) => {
         firstname: req.body.firstname,
         lastname: req.body.lastname,
         email: req.body.email,
+        role: req.body.role,
       },
       (err, newUser) => {
         if (err) {
@@ -77,6 +78,7 @@ exports.loginuser = (req, res) => {
         email: foundUser.email,
         firstname: foundUser.firstname,
         lastname: foundUser.lastname,
+        role: foundUser.role,
       },
       secret,
       {
