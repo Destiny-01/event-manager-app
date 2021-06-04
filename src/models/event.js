@@ -16,6 +16,9 @@ const eventSchema = new mongoose.Schema({
     enum: ["business", "casual", "party", "general"],
     required: true,
   },
+  image: {
+    type: String,
+  },
 });
 const Event = mongoose.model("Event", eventSchema);
 module.exports = Event;

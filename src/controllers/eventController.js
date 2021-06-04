@@ -1,6 +1,10 @@
 const Event = require("../models/event");
+const request = require("request");
+const { image } = require("./image");
 
 exports.createNewEvent = (req, res) => {
+  let imageUrl = image(req.body.category);
+  console.log(imageUrl);
   Event.create(
     {
       ...req.body,
@@ -9,7 +13,24 @@ exports.createNewEvent = (req, res) => {
       if (err) {
         return res.status(500).json({ message: err });
       } else {
-        return res.status(200).json({ message: "new event created", newEvent });
+        request(
+          `https://imagegen.herokuapp.com/?category=${req.body.category}`,
+          { json: true },
+          (err, response, body) => {
+            if (err) {
+              return res.status(500).json({ message: err });
+            }
+            newEvent.image = body.image;
+            newEvent.save((err, savedImage) => {
+              if (err) {
+                return res.status(500).json({ message: err });
+              }
+              return res
+                .status(200)
+                .json({ message: "image added successfully", savedImage });
+            });
+          }
+        );
       }
     }
   );
